@@ -50,7 +50,7 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "node . --log-level debug --root ../pages",
+            "command": "node . --log-level debug --root ./test --build ./out",
             "group": {
                 "kind": "test",
                 "isDefault": true

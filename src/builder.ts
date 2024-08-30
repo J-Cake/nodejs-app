@@ -21,21 +21,36 @@ export default async function build(path: Path): Promise<void> {
 }
 
 export async function template(source: string, variables: Record<string, any>): Promise<string> {
-    outer: while (source.includes('<?js(')) {
-        const index = source.indexOf('<?js(');
-        let bracketCount = 1;
+    let input = source;
+    outer: while (input.includes('<?js(')) {
+        let bracketCount = 0;
+        const index = input.indexOf('<?js(');
+        const token: string | null = [...input.slice(index)]
+            .first((char, a) => {
+                if (char == '(') bracketCount++;
+                else if (char == ')' && --bracketCount == 0) return { some: input.slice(index, input.indexOf('?>', index + a) + 2) };
+            });
 
-        for (const [a, char] of Object.entries(source.slice(index)))
-            if (char == '(')
-                bracketCount++;
-            else if (char == ')')
-                if (--bracketCount == 0) {
-                    const expr = source.slice(index, index + Number(a));
-
-                    log.debug(expr);
-                    break outer;
-                }
+        if (!token)
+            continue outer;
+    
+        input = input.slice(0, index) + eval(token.slice(4, -2)).toString() + input.slice(index + token.length);
     }
 
-    return "";
+    return input;
 }
+
+declare class Array<T> {
+    first<J>(predicate: (i: T, a: number) => null | {some: J}): J | null;
+}
+
+Array.prototype.first = function<T, J>(this: Array<T>, predicate: (i: any, a: number) => null | {some: J}): J | null {
+    for (const [a, i] of Object.entries(this)) {
+        const res = predicate(i, Number(a));
+
+        if (res != null && 'some' in res)
+            return res.some;
+    }
+
+    return null;
+};
