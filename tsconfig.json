@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "esnext",
+        "module": "NodeNext",
         "target": "esnext",
         "moduleResolution": "NodeNext",
         "sourceMap": true,
@@ -14,7 +14,12 @@
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
         "strict": true,
+        "rootDir": "."
     },
+    "include": [
+        "run.js",
+        "src"
+    ],
     "exclude": [
         "build"
     ]

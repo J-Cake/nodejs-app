@@ -6,6 +6,13 @@
         "@j-cake/jcake-utils": "latest",
         "chalk": "latest"
     },
+    "scripts": {
+        "build:main.js": "esbuild src/index.ts --outdir=build --bundle --sourcemap --format=esm --platform=node",
+        "build:run.js": "copy run.js build",
+        "build:package.json": "jq -r \". *  .deploy * {deploy:null} | with_entries(select(.value |. != null))\" < package.json > build/package.json",
+        "phony:clean": "rm -rf build target node_modules *lock* *yarn* *pnpm*",
+        "build": "jq -r \".scripts | keys_unsorted[] | select(. | startswith(\\\"build:\\\"))\" < package.json | xargs -d \\\\n -I {} $npm_execpath run {}"
+    },
     "devDependencies": {
         "@types/node": "latest",
         "@j-cake/mkjson": "latest",
@@ -19,6 +26,8 @@
         "main": "run.js",
         "imports": {
             "#app": "./index.js"
-        }
+        },
+        "scripts": null,
+        "devDependencies": null
     }
 }
